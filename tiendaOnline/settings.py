@@ -129,4 +129,7 @@ os.path.join(BASE_DIR, 'tiendaOnline/static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'chalooo.Usuario'
+USERNAME_FIELD = 'correo'
+REQUIRED_FIELDS = ['nombre_s', 'apellido_s']
+
 
