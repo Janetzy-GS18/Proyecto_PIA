@@ -1,5 +1,9 @@
+"""Rutas de la aplicación Chalooo."""
+
 from django.urls import path
 from . import views
+
+app_name = "chalooo" # pylint: disable=invalid-name
 
 urlpatterns = [
     path('', views.index, name='index'),
