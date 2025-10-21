@@ -130,5 +130,6 @@ AUTH_USER_MODEL = 'chalooo.Usuario'
 USERNAME_FIELD = 'correo'
 REQUIRED_FIELDS = ['nombre_s', 'apellido_s']
 
+# Archivos multimedia (imágenes subidas)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

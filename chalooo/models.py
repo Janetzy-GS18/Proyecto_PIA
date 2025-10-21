@@ -3,6 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
+# ---------- MANAGER PERSONALIZADO PARA USUARIO ----------
 class UsuarioManager(BaseUserManager):
     """Gestor personalizado para crear usuarios y superusuarios."""
 
@@ -25,16 +26,19 @@ class UsuarioManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         return self.create_user(correo, nombre_s, apellido_s, password, **extra_fields)
 
+# ---------- Usuario ----------
 class Usuario(AbstractBaseUser, PermissionsMixin):
     """Modelo base de usuario del sistema."""
     idusuario = models.AutoField(primary_key=True)
     nombre_s = models.CharField(max_length=50)
     apellido_s = models.CharField(max_length=50)
     correo = models.EmailField(unique=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
     objects = UsuarioManager()
+
     USERNAME_FIELD = "correo"
     REQUIRED_FIELDS = ["nombre_s", "apellido_s"]
 
@@ -94,7 +98,7 @@ class Producto(models.Model):
 
 # ---------- Venta ----------
 class Venta(models.Model):
-    """Retorna el nombre del producto."""
+    """Modelo que representa una venta realizada por un cliente."""
     id_venta = models.AutoField(primary_key=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now_add=True)
@@ -122,3 +126,7 @@ class DetalleVenta(models.Model):
         # recalcular subtotal siempre basado en producto.precio
         self.subtotal = self.producto.precio * self.cantidad # pylint: disable=no-member
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        """Representación legible del detalle de venta."""
+        return f"{self.producto.nombre} x{self.cantidad} (${self.subtotal})"  # pylint: disable=no-member
