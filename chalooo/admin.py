@@ -53,3 +53,4 @@ class DetalleVentaAdmin(admin.ModelAdmin):
     """Configuración del modelo DetalleVenta."""
     list_display = ('venta', 'producto', 'cantidad', 'subtotal')
     search_fields = ('producto__nombre',)
+    readonly_fields = ('subtotal',)

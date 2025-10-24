@@ -102,11 +102,17 @@ class Venta(models.Model):
     id_venta = models.AutoField(primary_key=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now_add=True)
-    total = models.DecimalField(max_digits=12, decimal_places=2)
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+
+    def actualizar_total(self):
+        """Recalcula el total sumando los subtotales de sus detalles."""
+        total = sum(det.subtotal for det in self.detalleventa_set.all()) # pylint: disable=no-member
+        self.total = total
+        self.save(update_fields=["total"])
 
     def __str__(self):
         """Muestra el ID de venta y el cliente."""
-        return f"Venta {self.id_venta} - Cliente {self.cliente.usuario.nombre_s}" # pylint: disable=no-member
+        return f"Venta {self.id_venta} - Cliente {self.cliente.usuario.nombre_s}"  # pylint: disable=no-member
 
 
 # ---------- DetalleVenta ----------
@@ -122,10 +128,35 @@ class DetalleVenta(models.Model):
         unique_together = ('venta', 'producto')
 
     def save(self, *args, **kwargs):
-        """Muestra detalle de producto y cantidad por venta."""
-        # recalcular subtotal siempre basado en producto.precio
-        self.subtotal = self.producto.precio * self.cantidad # pylint: disable=no-member
+        """Calcula el subtotal, actualiza el stock y el total de la venta."""
+        # recalcular subtotal
+        self.subtotal = self.producto.precio * self.cantidad  # pylint: disable=no-member
+
+        # Si es nuevo, descontar stock
+        if self._state.adding:
+            if self.cantidad > self.producto.stock:  # pylint: disable=no-member
+                raise ValueError(f"Stock insuficiente para el producto {self.producto.nombre}")  # pylint: disable=no-member
+            self.producto.stock -= self.cantidad  # pylint: disable=no-member
+        else:
+            # Si se edita, primero restaurar el stock anterior
+            original = DetalleVenta.objects.get(pk=self.pk) # pylint: disable=no-member
+            diferencia = self.cantidad - original.cantidad
+            if diferencia > 0 and diferencia > self.producto.stock:  # pylint: disable=no-member
+                raise ValueError(f"Stock insuficiente para el producto {self.producto.nombre}")  # pylint: disable=no-member
+            self.producto.stock -= diferencia  # pylint: disable=no-member
+
+        self.producto.save()  # pylint: disable=no-member
         super().save(*args, **kwargs)
+
+        # actualizar total de la venta
+        self.venta.actualizar_total() # pylint: disable=no-member
+
+    def delete(self, *args, **kwargs):
+        """Restaura el stock y actualiza el total al eliminar un detalle."""
+        self.producto.stock += self.cantidad  # pylint: disable=no-member
+        self.producto.save()  # pylint: disable=no-member
+        super().delete(*args, **kwargs)
+        self.venta.actualizar_total() # pylint: disable=no-member
 
     def __str__(self):
         """Representación legible del detalle de venta."""
