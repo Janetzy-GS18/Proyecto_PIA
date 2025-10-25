@@ -16,7 +16,7 @@ def usuarios(request):
     datos = {
         'usuarios': Usuario.objects.all()
     }
-    return render(request, "usuarios.html", context=datos)
+    return render(request, "chalooo/usuarios.html", context=datos)
 
 
 # ---------- Clientes ----------
@@ -25,7 +25,7 @@ def clientes(request):
     datos = {
         'clientes': Cliente.objects.all() # pylint: disable=no-member
     }
-    return render(request, "clientes.html", context=datos)
+    return render(request, "chalooo/clientes.html", context=datos)
 
 
 # ---------- Teléfonos de clientes ----------
@@ -34,7 +34,7 @@ def telefonos(request):
     datos = {
         'telefonos': TelefonoCliente.objects.all() # pylint: disable=no-member
     }
-    return render(request, "telefonos.html", context=datos)
+    return render(request, "chalooo/telefonos.html", context=datos)
 
 
 # ---------- Empleados ----------
@@ -43,7 +43,7 @@ def empleados(request):
     datos = {
         'empleados': Empleado.objects.all() # pylint: disable=no-member
     }
-    return render(request, "empleados.html", context=datos)
+    return render(request, "chalooo/empleados.html", context=datos)
 
 
 # ---------- Productos ----------
@@ -52,7 +52,7 @@ def productos(request):
     datos = {
         'productos': Producto.objects.all() # pylint: disable=no-member
     }
-    return render(request, "productos.html", context=datos)
+    return render(request, "chalooo/productos.html", context=datos)
 
 
 # ---------- Ventas y detalles ----------
@@ -61,11 +61,11 @@ def ventas(request):
     datos = {
         'ventas': Venta.objects.all(), # pylint: disable=no-member
     }
-    return render(request, "ventas.html", context=datos)
+    return render(request, "chalooo/ventas.html", context=datos)
 
 # ---------- Detalles de Ventas ----------
 def detalle_venta(request, venta_id):
     """Muestra los productos y detalles de una venta específica."""
     venta = Venta.objects.get(pk=venta_id)  # Busca la venta en la BD # pylint: disable=no-member
     detalles = DetalleVenta.objects.filter(venta=venta)  # Trae los productos de esa venta # pylint: disable=no-member
-    return render(request, 'detalle_venta.html', {'venta': venta, 'detalles': detalles})
+    return render(request, 'chalooo/detalle_venta.html', {'venta': venta, 'detalles': detalles})

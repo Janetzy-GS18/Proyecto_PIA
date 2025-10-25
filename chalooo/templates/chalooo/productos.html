@@ -10,7 +10,7 @@
         <div class="producto">
             <h3>{{ producto.nombre }}</h3>
             <p>{{ producto.descripcion }}</p>
-            <p>Precio: ${{ producto.precio }}</p>
+            <p><strong>Precio:</strong> ${{ producto.precio }}</p>
             {% if producto.imagen %}
                 <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" width="150">
             {% endif %}

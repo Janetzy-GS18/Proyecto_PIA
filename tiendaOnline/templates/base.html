@@ -3,26 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Tienda Online{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'chalooo/css/estilos.css' %}">
+    <title>{% block title %}Chaloo{% endblock %}</title>
+
+    <!-- Estilos básicos temporales -->
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #6c5ce7;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #a29bfe;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        footer {
+            background-color: #6c5ce7;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .producto {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-color: #fff;
+        }
+
+        .producto img {
+            display: block;
+            margin-top: 0.5rem;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Tienda Online</h1>
-        <nav>
-            <a href="/">Inicio</a> |
-            <a href="{% url 'productos' %}">Productos</a> |
-            <a href="{% url 'ventas' %}">Ventas</a>
-        </nav>
+        <h1>Chaloo - Tienda Online</h1>
     </header>
+
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/producto/">Productos</a>
+        <a href="/clientes/">Clientes</a>
+        <a href="/ventas/">Ventas</a>
+    </nav>
 
     <main>
         {% block content %}
+        <!-- Contenido específico de cada página -->
         {% endblock %}
     </main>
 
     <footer>
-        <p>© 2025 Tienda Online - Chalooo</p>
+        <p>&copy; 2025 Chaloo. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>
