@@ -1,22 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Catálogo de Productos{% endblock %}
+{% block title %}Productos{% endblock %}
 
 {% block content %}
 <h2>Catálogo de Productos</h2>
+<div id="productGrid"></div>
 
-<div class="productos">
-    {% for producto in productos %}
-        <div class="producto">
-            <h3>{{ producto.nombre }}</h3>
-            <p>{{ producto.descripcion }}</p>
-            <p><strong>Precio:</strong> ${{ producto.precio }}</p>
-            {% if producto.imagen %}
-                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" width="150">
-            {% endif %}
-        </div>
-    {% empty %}
-        <p>No hay productos disponibles.</p>
-    {% endfor %}
-</div>
+<script>
+    const products = {{ productos_json|safe }};
+    document.addEventListener('DOMContentLoaded', loadProducts);
+</script>
 {% endblock %}
