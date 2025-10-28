@@ -1,13 +1,19 @@
 {% extends "base.html" %}
-
-{% block title %}Productos{% endblock %}
+{% block title %}Catálogo de productos{% endblock %}
 
 {% block content %}
-<h2>Catálogo de Productos</h2>
-<div id="productGrid"></div>
+<h2>Catálogo de productos</h2>
 
-<script>
-    const products = {{ productos_json|safe }};
-    document.addEventListener('DOMContentLoaded', loadProducts);
-</script>
+<div class="productos">
+    {% for p in productos %}
+    <div class="producto">
+        <h3>{{ p.nombre }}</h3>
+        <p>{{ p.descripcion }}</p>
+        <p><strong>${{ p.precio }}</strong></p>
+        <a href="{% url 'chalooo:agregar_al_carrito' p.id_producto %}">Agregar al carrito</a>
+    </div>
+    {% empty %}
+    <p>No hay productos disponibles.</p>
+    {% endfor %}
+</div>
 {% endblock %}
