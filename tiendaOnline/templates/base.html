@@ -9,13 +9,21 @@
 </head>
 <body>
     <header>
-        <h1>Chalooo - Tu tienda online BASE</h1>
-        <nav>
-            <a href="/">Inicio</a> |
-            <a href="/productos/">Productos</a> |
-            <a href="/carrito/">Carrito</a>
-        </nav>
-    </header>
+    <h1>Chalooo - Tu tienda en línea</h1>
+    <nav>
+        <a href="{% url 'chalooo:index' %}">Inicio</a> |
+        <a href="{% url 'chalooo:productos' %}">Productos</a> |
+        <a href="{% url 'chalooo:carrito' %}">Carrito</a> |
+
+        {% if user.is_authenticated %}
+            <span>Hola, {{ user.nombre_s }}</span> |
+            <a href="{% url 'chalooo:logout' %}">Cerrar sesión</a>
+        {% else %}
+            <a href="{% url 'chalooo:login' %}">Iniciar sesión</a> |
+            <a href="{% url 'chalooo:registro' %}">Registrarse</a>
+        {% endif %}
+    </nav>
+</header>
 
     <main>
         {% block content %}
