@@ -1,27 +1,37 @@
 {% extends "base.html" %}
-{% block title %}Carrito{% endblock %}
+{% block title %}Carrito de Compras{% endblock %}
 
 {% block content %}
-<h2>Carrito de Compras</h2>
+<h2 class="mb-4 text-center">🛍️ Tu Carrito</h2>
 
 {% if items %}
-    <table>
+<table class="table table-bordered align-middle">
+    <thead class="table-light">
         <tr>
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Subtotal</th>
         </tr>
+    </thead>
+    <tbody>
         {% for item in items %}
-            <tr>
-                <td>{{ item.producto.nombre }}</td>
-                <td>{{ item.cantidad }}</td>
-                <td>${{ item.subtotal }}</td>
-            </tr>
+        <tr>
+            <td>{{ item.producto.nombre }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>${{ item.subtotal }}</td>
+        </tr>
         {% endfor %}
-    </table>
-    <h3>Total: ${{ total }}</h3>
-    <a href="{% url 'chalooo:checkout' %}"><button>Finalizar compra</button></a>
+    </tbody>
+</table>
+
+<div class="text-end">
+    <h4 class="fw-bold">Total: ${{ total }}</h4>
+    <a href="{% url 'chalooo:checkout' %}" class="btn btn-success mt-3">Finalizar compra</a>
+</div>
+
 {% else %}
-    <p>Tu carrito está vacío.</p>
+<div class="alert alert-info text-center">
+    Tu carrito está vacío. <a href="{% url 'chalooo:productos' %}" class="alert-link">Explorar productos</a>
+</div>
 {% endif %}
 {% endblock %}

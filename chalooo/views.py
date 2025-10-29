@@ -96,14 +96,15 @@ def confirmacion(request):
 
 # ------------------------- INICIO DE SESIÓN -------------------------
 
-def iniciar_sesion(request):
+def login_view(request):
     """Permite iniciar sesión a clientes registrados."""
     if request.method == "POST":
         formulario = LoginClienteForm(request, data=request.POST)
         if formulario.is_valid():
             correo = formulario.cleaned_data.get("username")
-            contraseña = formulario.cleaned_data.get("password")
-            usuario = authenticate(request, username=correo, password=contraseña)
+            contrasena = formulario.cleaned_data.get("password")
+            print("Intentando login:", correo)  # Debug temporal
+            usuario = authenticate(request, username=correo, password=contrasena)
             if usuario is not None:
                 login(request, usuario)
                 messages.success(request, f"Bienvenido/a, {usuario.nombre_s}")

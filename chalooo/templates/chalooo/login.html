@@ -2,21 +2,37 @@
 {% block title %}Iniciar Sesión{% endblock %}
 
 {% block content %}
-<h2 class="text-center">Iniciar Sesión</h2>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4">
+            <h2 class="text-center mb-4">Iniciar Sesión</h2>
 
-{% if messages %}
-    <ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-    </ul>
-{% endif %}
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
 
-<form method="POST">
-    {% csrf_token %}
-    {{ formulario.as_p }}
-    <button type="submit">Entrar</button>
-</form>
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                {{ formulario.as_p }}
+                <div class="mb-3">
+                    <label for="correo" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="correo" name="correo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="contrasena" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+            </form>
 
-<p>¿No tienes cuenta? <a href="{% url 'chalooo:registro' %}">Regístrate aquí</a></p>
+            <p class="text-center mt-3">
+                ¿No tienes cuenta?
+                <a href="{% url 'chalooo:registro' %}">Regístrate aquí</a>
+            </p>
+        </div>
+    </div>
+</div>
 {% endblock %}

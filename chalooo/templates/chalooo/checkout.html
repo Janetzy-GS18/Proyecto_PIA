@@ -1,12 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Finalizar Compra{% endblock %}
+{% block title %}Confirmar Pedido{% endblock %}
 
 {% block content %}
-<h2>Confirmar Compra</h2>
+<div class="card p-4 shadow-sm">
+    <h2 class="mb-3">Resumen del pedido</h2>
 
-{% if error %}
-    <p>{{ error }}</p>
-{% else %}
-    <p>Procesando tu pedido...</p>
-{% endif %}
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+        <p>¿Deseas confirmar tu compra?</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Confirmar pedido</button>
+            <a href="{% url 'chalooo:carrito' %}" class="btn btn-secondary ms-2">Volver</a>
+        </form>
+    {% endif %}
+</div>
 {% endblock %}

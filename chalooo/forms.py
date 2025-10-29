@@ -39,8 +39,18 @@ class RegistroClienteForm(forms.ModelForm):
             Cliente.objects.create(usuario=usuario, direccion="Sin dirección registrada") # pylint: disable=no-member
         return usuario
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
+
 
 class LoginClienteForm(AuthenticationForm):
-    """Formulario para iniciar sesión."""
-    username = forms.EmailField(label="Correo electrónico")
-    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
+    """Formulario para iniciar sesión con correo."""
+    username = forms.CharField(label="Correo electrónico",
+                                widget=forms.EmailInput(
+                                    attrs={"class": "form-control"}))
+    password = forms.CharField(label="Contraseña",
+                                widget=forms.PasswordInput(
+                                    attrs={"class": "form-control"}))

@@ -1,89 +1,28 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f7f7f7;
-    margin: 0;
-    padding: 0;
-    color: #333;
+    background-color: #f8f9fa;
 }
 
-/* Encabezado general */
-header, nav {
-    background-color: #222;
-    color: white;
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-nav a {
-    color: white;
-    text-decoration: none;
-    margin-left: 20px;
-}
-nav a:hover {
-    text-decoration: underline;
+h1, h2, h3 {
+    color: #212529;
 }
 
-/* Contenido general */
-h2 {
-    text-align: center;
-    margin-top: 20px;
-}
-
-/* Catálogo */
-.grid-productos {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-}
-.tarjeta-producto {
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
     padding: 15px;
-    width: 220px;
-    text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-.tarjeta-producto img {
-    width: 180px;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-.precio {
-    font-weight: bold;
-    color: #008000;
-}
-.btn-agregar {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.btn-agregar:hover {
-    background-color: #0056b3;
+    background: white;
+    transition: transform 0.2s ease-in-out;
 }
 
-/* Tablas */
-table {
-    margin: 20px auto;
-    border-collapse: collapse;
-    width: 80%;
-    background: white;
+.product-card:hover {
+    transform: scale(1.02);
 }
-th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
 }
-th {
-    background: #eee;
-}
-button {
-    cursor: pointer;
+
+.btn-primary:hover {
+    background-color: #0056b3;
 }
