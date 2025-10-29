@@ -1,4 +1,12 @@
 {% extends "base.html" %}
+{% block title %}Finalizar Compra{% endblock %}
+
 {% block content %}
-<h2>Tu checkout</h2>
+<h2>Confirmar Compra</h2>
+
+{% if error %}
+    <p>{{ error }}</p>
+{% else %}
+    <p>Procesando tu pedido...</p>
+{% endif %}
 {% endblock %}

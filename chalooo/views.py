@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import RegistroClienteForm, LoginClienteForm
 
-from .models import Producto, Venta, DetalleVenta, Cliente
+from .models import Producto, Venta, DetalleVenta, Cliente, Usuario
 
 
 # ------------------------- PÁGINA PRINCIPAL -------------------------
@@ -29,8 +29,8 @@ def productos(request):
 def agregar_al_carrito(request, producto_id):
     """Agrega un producto al carrito de sesión."""
     producto_sesion = get_object_or_404(Producto, id_producto=producto_id)  # pylint: disable=unused-variable
-    carrito_items  = request.session.get("carrito", {})
-    carrito_items [str(producto_id)] = carrito_items .get(str(producto_id), 0) + 1
+    carrito_items = request.session.get("carrito", {})
+    carrito_items[str(producto_id)] = carrito_items.get(str(producto_id), 0) + 1
     request.session["carrito"] = carrito_items
 
     return redirect("chalooo:carrito")
@@ -72,7 +72,7 @@ def checkout(request):
     venta = Venta.objects.create(cliente=cliente, total=0) # pylint: disable=no-member
 
     total = Decimal('0.00')
-    for producto_id, cantidad in carrito.items(): # pylint: disable=no-member
+    for producto_id, cantidad in carrito_items.items(): # pylint: disable=no-member
         producto = get_object_or_404(Producto, id_producto=producto_id)
         detalle = DetalleVenta.objects.create( # pylint: disable=no-member
             venta=venta,
@@ -126,52 +126,29 @@ def logout_view(request):
     messages.info(request, "Has cerrado sesión correctamente.")
     return redirect("chalooo:index")
 
-# ------------------------- AUTENTICACIÓN -------------------------
-
-def login_view(request):
-    """Permite iniciar sesión con correo y contraseña."""
-    if request.method == "POST":
-        correo = request.POST.get("correo")
-        contrasena = request.POST.get("contrasena")
-
-        user = authenticate(request, username=correo, password=contrasena)
-        if user is not None:
-            login(request, user)
-            return redirect("chalooo:index")
-        else:
-            return render(request, "chalooo/login.html",
-                        {"error": "Correo o contraseña incorrectos."})
-    return render(request, "chalooo/login.html")
-
 
 # ------------------------- REGISTRO -------------------------
 
 def registro(request):
-    """Permite registrar un nuevo cliente."""
+    """Permite registrar nuevos clientes en el sistema."""
     if request.method == "POST":
         form = RegistroClienteForm(request.POST)
         if form.is_valid():
-            datos = form.cleaned_data
-            contrasena = datos["contrasena"]
-            confirmar = datos["confirmar_contrasena"]
-
-            if contrasena != confirmar:
+            if form.cleaned_data["contrasena"] != form.cleaned_data["confirmar_contrasena"]:
                 messages.error(request, "Las contraseñas no coinciden.")
-                return render(request, "chalooo/registro.html", {"form": form})
-
-            # Crear usuario
-            usuario = Usuario.objects.create_user(
-                correo=datos["correo"],
-                nombre_s=datos["nombre_s"],
-                apellido_s=datos["apellido_s"],
-                password=contrasena
-            )
-
-            # Crear cliente asociado
-            Cliente.objects.create(usuario=usuario, direccion="Sin dirección definida") # pylint: disable=no-member
-
-            messages.success(request, "Tu cuenta fue creada exitosamente.")
-            return redirect("chalooo:login")
+            else:
+                usuario = Usuario.objects.create_user(
+                    correo=form.cleaned_data["correo"],
+                    nombre_s=form.cleaned_data["nombre_s"],
+                    apellido_s=form.cleaned_data["apellido_s"],
+                    password=form.cleaned_data["contrasena"]
+                )
+                # Crear cliente vinculado
+                Cliente.objects.create(usuario=usuario, direccion="") # pylint: disable=no-member
+                # Iniciar sesión automática
+                login(request, usuario)
+                messages.success(request, "Registro exitoso. ¡Bienvenido!")
+                return redirect("chalooo:index")
     else:
         form = RegistroClienteForm()
 

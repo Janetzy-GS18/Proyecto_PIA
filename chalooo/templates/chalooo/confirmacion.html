@@ -1,6 +1,8 @@
 {% extends "base.html" %}
+{% block title %}Compra Confirmada{% endblock %}
+
 {% block content %}
 <h2>¡Gracias por tu compra!</h2>
-<p>Tu pedido se ha registrado exitosamente.</p>
-<a href="{% url 'chalooo:productos' %}">Volver al catálogo</a>
+<p>Tu pedido ha sido registrado correctamente.</p>
+<a href="{% url 'chalooo:productos' %}"><button>Volver al catálogo</button></a>
 {% endblock %}

@@ -1,17 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Catálogo de productos{% endblock %}
+{% block title %}Catálogo de Productos{% endblock %}
 
 {% block content %}
-<h2>Catálogo de productos</h2>
+<h2>Catálogo de Productos</h2>
 
-<div class="productos">
-    {% for p in productos %}
-    <div class="producto">
-        <h3>{{ p.nombre }}</h3>
-        <p>{{ p.descripcion }}</p>
-        <p><strong>${{ p.precio }}</strong></p>
-        <a href="{% url 'chalooo:agregar_al_carrito' p.id_producto %}">Agregar al carrito</a>
-    </div>
+<div class="grid-productos">
+    {% for producto in productos %}
+        <div class="tarjeta-producto">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            {% endif %}
+            <h4>{{ producto.nombre }}</h4>
+            <p>{{ producto.descripcion }}</p>
+            <p class="precio">${{ producto.precio }}</p>
+            <a href="{% url 'chalooo:agregar_al_carrito' producto.id_producto %}">
+                <button class="btn-agregar">Agregar al carrito</button>
+            </a>
+        </div>
     {% empty %}
     <p>No hay productos disponibles.</p>
     {% endfor %}

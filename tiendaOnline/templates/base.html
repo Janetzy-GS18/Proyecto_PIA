@@ -19,7 +19,7 @@
             <span>Hola, {{ user.nombre_s }}</span> |
             <a href="{% url 'chalooo:logout' %}">Cerrar sesión</a>
         {% else %}
-            <a href="{% url 'chalooo:login' %}">Iniciar sesión</a> |
+            <a href="{% url 'chalooo:iniciar_sesion' %}">Iniciar sesión</a> |
             <a href="{% url 'chalooo:registro' %}">Registrarse</a>
         {% endif %}
     </nav>

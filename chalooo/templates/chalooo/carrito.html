@@ -1,25 +1,27 @@
 {% extends "base.html" %}
+{% block title %}Carrito{% endblock %}
+
 {% block content %}
-<h2>Tu carrito</h2>
+<h2>Carrito de Compras</h2>
 
 {% if items %}
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Producto</th>
-        <th>Cantidad</th>
-        <th>Subtotal</th>
-    </tr>
-    {% for item in items %}
-    <tr>
-        <td>{{ item.producto.nombre }}</td>
-        <td>{{ item.cantidad }}</td>
-        <td>${{ item.subtotal }}</td>
-    </tr>
-    {% endfor %}
-</table>
-<p><strong>Total:</strong> ${{ total }}</p>
-<a href="{% url 'chalooo:checkout' %}">Finalizar compra</a>
+    <table>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.producto.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.subtotal }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h3>Total: ${{ total }}</h3>
+    <a href="{% url 'chalooo:checkout' %}"><button>Finalizar compra</button></a>
 {% else %}
-<p>Tu carrito está vacío.</p>
+    <p>Tu carrito está vacío.</p>
 {% endif %}
 {% endblock %}
