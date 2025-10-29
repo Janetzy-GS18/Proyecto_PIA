@@ -1,28 +1,131 @@
+/* === ESTILO GENERAL === */
 body {
-    background-color: #f8f9fa;
-}
-
-h1, h2, h3 {
+    background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #212529;
+    margin: 0;
+    padding: 0;
 }
 
+h1, h2, h3, h4 {
+    color: #212529;
+    font-weight: 600;
+}
+
+/* === TARJETAS DE PRODUCTO === */
 .product-card {
     border: 1px solid #ddd;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 15px;
     background: white;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    text-align: center;
 }
 
 .product-card:hover {
     transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
+.product-card img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* === BOTONES === */
 .btn-primary {
     background-color: #007bff;
     border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    transition: background-color 0.2s;
 }
 
 .btn-primary:hover {
     background-color: #0056b3;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    border-radius: 8px;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* === TARJETAS CENTRADAS (LOGIN / REGISTRO / CHECKOUT) === */
+.card {
+    border-radius: 1rem;
+    background-color: #fff;
+}
+
+.form-control {
+    border-radius: 8px;
+}
+
+/* === ALERTAS === */
+.alert {
+    border-radius: 8px;
+}
+
+/* === PIE DE PÁGINA === */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #212529;
+    color: white;
+    margin-top: 40px;
+}
+
+/* === ENLACES === */
+a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+a:hover {
+    color: #0b5ed7;
+    text-decoration: underline;
+}
+
+/* === CARRITO === */
+.table {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #f1f3f5;
+}
+
+/* === EFECTOS DE ENTRADA === */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === ANIMACIONES === */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }

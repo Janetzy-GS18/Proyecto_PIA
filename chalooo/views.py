@@ -58,40 +58,51 @@ def checkout(request):
     """Confirma la compra y genera una venta."""
     carrito_items = request.session.get('carrito', {})
     if not carrito_items:
+        messages.warning(request, "Tu carrito está vacío.")
         return redirect('chalooo:carrito')
 
-    # Verifica que el usuario sea cliente
+    # Verifica que el usuario esté registrado como cliente
     try:
-        cliente = Cliente.objects.get(usuario=request.user) # pylint: disable=no-member
-    except Cliente.DoesNotExist: # pylint: disable=no-member
-        return render(
-            request, "chalooo/checkout.html",
-            {"error": "Debes registrarte como cliente."})
+        cliente = Cliente.objects.get(usuario=request.user)  # pylint: disable=no-member
+    except Cliente.DoesNotExist:  # pylint: disable=no-member
+        return render(request, "chalooo/checkout.html",
+                        {"error": "Debes registrarte como cliente."})
 
-    # Crea la venta
-    venta = Venta.objects.create(cliente=cliente, total=0) # pylint: disable=no-member
-
+    # Preparar los productos del carrito
+    items = []
     total = Decimal('0.00')
-    for producto_id, cantidad in carrito_items.items(): # pylint: disable=no-member
+    for producto_id, cantidad in carrito_items.items():
         producto = get_object_or_404(Producto, id_producto=producto_id)
-        detalle = DetalleVenta.objects.create( # pylint: disable=no-member
-            venta=venta,
-            producto=producto,
-            cantidad=cantidad,
-            subtotal=producto.precio * cantidad
-        )
-        total += detalle.subtotal
+        subtotal = producto.precio * cantidad
+        items.append({'producto': producto, 'cantidad': cantidad, 'subtotal': subtotal})
+        total += subtotal
 
-    # Actualiza el total y limpia carrito
-    venta.total = total
-    venta.save()
-    request.session['carrito'] = {}
+    # Si se confirma la compra (método POST)
+    if request.method == "POST":
+        venta = Venta.objects.create(cliente=cliente, total=0)  # pylint: disable=no-member
+        for item in items:
+            DetalleVenta.objects.create(  # pylint: disable=no-member
+                venta=venta,
+                producto=item['producto'],
+                cantidad=item['cantidad'],
+                subtotal=item['subtotal']
+            )
+            # Actualiza stock
+            item['producto'].stock -= item['cantidad']
+            item['producto'].save()
 
-    return redirect('chalooo:confirmacion')
+        # Actualiza total
+        venta.total = total
+        venta.save()
 
-def confirmacion(request):
-    """Pantalla final de compra"""
-    return render(request, "chalooo/confirmacion.html")
+        # Vaciar carrito
+        request.session['carrito'] = {}
+        messages.success(request, "¡Compra confirmada con éxito!")
+        return redirect('chalooo:confirmacion')
+
+    # Si es una vista GET (mostrar resumen antes de confirmar)
+    contexto = {'items': items, 'total': total}
+    return render(request, "chalooo/checkout.html", contexto)
 
 
 # ------------------------- INICIO DE SESIÓN -------------------------

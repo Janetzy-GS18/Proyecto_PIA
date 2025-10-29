@@ -1,19 +1,53 @@
 {% extends "base.html" %}
-{% block title %}Confirmar Pedido{% endblock %}
+{% block title %}Finalizar compra{% endblock %}
 
 {% block content %}
-<div class="card p-4 shadow-sm">
-    <h2 class="mb-3">Resumen del pedido</h2>
+<div class="container mt-5 fade-in">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4">Confirmar Compra</h2>
 
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% else %}
-        <p>¿Deseas confirmar tu compra?</p>
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success">Confirmar pedido</button>
-            <a href="{% url 'chalooo:carrito' %}" class="btn btn-secondary ms-2">Volver</a>
-        </form>
-    {% endif %}
+        {% if error %}
+            <div class="alert alert-danger text-center">{{ error }}</div>
+        {% else %}
+            <p class="text-center mb-4">
+                Revisa los productos de tu carrito antes de confirmar la compra.
+            </p>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.producto.nombre }}</td>
+                            <td>{{ item.cantidad }}</td>
+                            <td>${{ item.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 class="text-end mb-4">Total: <strong>${{ total }}</strong></h4>
+
+            <div class="text-center">
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-lg px-4">
+                        Confirmar Compra
+                    </button>
+                    <a href="{% url 'chalooo:carrito' %}" class="btn btn-secondary btn-lg px-4">
+                        Volver al Carrito
+                    </a>
+                </form>
+            </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

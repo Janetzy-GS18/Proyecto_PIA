@@ -1,37 +1,51 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Carrito de Compras{% endblock %}
 
 {% block content %}
-<h2 class="mb-4 text-center">🛍️ Tu Carrito</h2>
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Tu Carrito</h2>
 
-{% if items %}
-<table class="table table-bordered align-middle">
-    <thead class="table-light">
-        <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in items %}
-        <tr>
-            <td>{{ item.producto.nombre }}</td>
-            <td>{{ item.cantidad }}</td>
-            <td>${{ item.subtotal }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    {% if items %}
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Producto</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-end">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.producto.nombre }}</strong><br>
+                            <small>{{ item.producto.descripcion|default:"Sin descripción" }}</small>
+                        </td>
+                        <td class="text-center">{{ item.cantidad }}</td>
+                        <td class="text-end">${{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-light">
+                        <td colspan="2" class="text-end"><strong>Total:</strong></td>
+                        <td class="text-end"><strong>${{ total }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-<div class="text-end">
-    <h4 class="fw-bold">Total: ${{ total }}</h4>
-    <a href="{% url 'chalooo:checkout' %}" class="btn btn-success mt-3">Finalizar compra</a>
+        <div class="text-end mt-4">
+            <a href="{% url 'chalooo:productos' %}" class="btn btn-secondary">Seguir comprando</a>
+            <a href="{% url 'chalooo:checkout' %}" class="btn btn-primary">Confirmar compra</a>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning text-center p-4">
+            🛒 Tu carrito está vacío.<br>
+            <a href="{% url 'chalooo:productos' %}" class="btn btn-outline-primary mt-3">Ver productos</a>
+        </div>
+    {% endif %}
 </div>
-
-{% else %}
-<div class="alert alert-info text-center">
-    Tu carrito está vacío. <a href="{% url 'chalooo:productos' %}" class="alert-link">Explorar productos</a>
-</div>
-{% endif %}
 {% endblock %}

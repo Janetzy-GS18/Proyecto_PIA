@@ -3,7 +3,19 @@
 {% block title %}Inicio{% endblock %}
 
 {% block content %}
-<h2>Bienvenido a Chalooo INDEX</h2>
-<p>Explora nuestros productos tecnológicos.</p>
-<a href="/productos/">Ver catálogo</a>
+<div class="container text-center mt-5">
+    {% if user.is_authenticated %}
+        <h2 class="text-success">¡Bienvenido/a, {{ user.nombre_s }}!</h2>
+        <p class="lead mt-3">
+            Nos alegra tenerte de vuelta. Explora nuestros productos o revisa tu carrito.
+        </p>
+        <a href="{% url 'chalooo:productos' %}" class="btn btn-primary mt-3">Ver productos</a>
+    {% else %}
+        <h2 class="text-dark">Bienvenido/a a Chalooo</h2>
+        <p class="lead mt-3">
+            Crea una cuenta o inicia sesión para acceder a nuestras promociones y realizar compras.
+        </p>
+        <a href="{% url 'chalooo:login' %}" class="btn btn-success mt-3">Iniciar sesión</a>
+    {% endif %}
+</div>
 {% endblock %}

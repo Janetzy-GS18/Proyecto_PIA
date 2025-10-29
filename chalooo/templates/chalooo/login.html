@@ -1,38 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Iniciar Sesión{% endblock %}
+{% load static %}
+
+{% block title %}Iniciar sesión - Chalooo{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm p-4">
-            <h2 class="text-center mb-4">Iniciar Sesión</h2>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+        <h2 class="text-center mb-4 text-primary">Iniciar sesión</h2>
 
-            {% if error %}
-                <div class="alert alert-danger">{{ error }}</div>
+        <form method="POST">
+            {% csrf_token %}
+            {% if formulario.errors %}
+                <div class="alert alert-danger">
+                    Por favor, revisa los datos ingresados.
+                </div>
             {% endif %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
 
-            <form method="POST" novalidate>
-                {% csrf_token %}
-                {{ formulario.as_p }}
-                <div class="mb-3">
-                    <label for="correo" class="form-label">Correo electrónico</label>
-                    <input type="email" class="form-control" id="correo" name="correo" required>
-                </div>
-                <div class="mb-3">
-                    <label for="contrasena" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="contrasena" name="contrasena" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Entrar</button>
-            </form>
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Correo electrónico</label>
+                {{ formulario.username }}
+            </div>
 
-            <p class="text-center mt-3">
-                ¿No tienes cuenta?
-                <a href="{% url 'chalooo:registro' %}">Regístrate aquí</a>
-            </p>
-        </div>
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Contraseña</label>
+                {{ formulario.password }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+        </form>
+
+        <hr>
+
+        <p class="text-center mb-0">
+            ¿No tienes una cuenta?
+            <a href="{% url 'chalooo:registro' %}" class="text-decoration-none">Regístrate aquí</a>
+        </p>
     </div>
 </div>
 {% endblock %}
