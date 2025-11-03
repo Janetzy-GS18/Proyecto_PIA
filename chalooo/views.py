@@ -114,8 +114,8 @@ def login_view(request):
         if formulario.is_valid():
             correo = formulario.cleaned_data.get("username")
             contrasena = formulario.cleaned_data.get("password")
-            print("Intentando login:", correo)  # Debug temporal
             usuario = authenticate(request, username=correo, password=contrasena)
+
             if usuario is not None:
                 login(request, usuario)
                 messages.success(request, f"Bienvenido/a, {usuario.nombre_s}")
@@ -165,3 +165,10 @@ def registro(request):
         form = RegistroClienteForm()
 
     return render(request, "chalooo/registro.html", {"form": form})
+
+# ------------------------- CONFIRMACION -------------------------
+
+@login_required
+def confirmacion(request):
+    """Pantalla final de compra"""
+    return render(request, "chalooo/confirmacion.html")
