@@ -8,15 +8,26 @@
             <i class="bi bi-check-circle-fill"></i> ¡Compra Exitosa!
         </h2>
         <p class="lead">Gracias por tu compra en <strong>Chalooo</strong>.</p>
-        <p>Recibirás un correo electrónico con los detalles de tu pedido.</p>
+        <p>Recibirás un recibo con los detalles de tu pedido.</p>
 
-        <div class="mt-4">
-            <a href="{% url 'chalooo:productos' %}" class="btn btn-primary px-4 me-2">
+        <div class="mt-4 d-flex justify-content-center flex-wrap gap-2">
+            <!-- Botón para seguir comprando -->
+            <a href="{% url 'chalooo:productos' %}" class="btn btn-primary px-4">
                 <i class="bi bi-shop"></i> Seguir Comprando
             </a>
+
+            <!-- Botón para volver al inicio -->
             <a href="{% url 'chalooo:index' %}" class="btn btn-outline-secondary px-4">
                 <i class="bi bi-house"></i> Volver al Inicio
             </a>
+
+            <!-- Botón para descargar recibo (solo si existe venta) -->
+            {% if venta %}
+            <a href="{% url 'chalooo:recibo_pdf' venta.id_venta %}" 
+                class="btn btn-success px-4">
+                <i class="bi bi-file-earmark-pdf"></i> Descargar Recibo
+            </a>
+            {% endif %}
         </div>
     </div>
 </div>

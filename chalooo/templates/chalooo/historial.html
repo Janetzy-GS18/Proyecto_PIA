@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Mis Compras - Chalooo{% endblock %}
+
+{% block content %}
+<div class="container mt-4 fade-in">
+    <h2 class="text-center text-success mb-4">
+        <i class="bi bi-bag-check"></i> Historial de Compras
+    </h2>
+
+    {% if ventas %}
+        <!-- Resumen general -->
+        <div class="alert alert-success text-center shadow-sm mb-4">
+            <strong>Total de compras:</strong> {{ ventas|length }} |
+            {% with ultima=ventas|first %}
+                <strong>Última compra:</strong> ${{ ultima.total|floatformat:2 }}
+            {% endwith %}
+        </div>
+
+        <!-- Tabla de historial -->
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle text-center">
+                <thead class="table-success">
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.id_venta }}</td>
+                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>${{ venta.total|floatformat:2 }}</td>
+                        <td>
+                            {% if venta.estado == "completada" %}
+                                <span class="badge bg-success">Completada</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Anulada</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'chalooo:recibo_pdf' venta.id_venta %}" 
+                                class="btn btn-sm btn-outline-info">
+                                Recibo
+                            </a>
+                            {% if venta.estado == "completada" %}
+                            <a href="{% url 'chalooo:anular_venta' venta.id_venta %}" 
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('¿Seguro que deseas anular esta compra?');">
+                                Anular
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center shadow-sm">
+            <i class="bi bi-emoji-frown"></i> Aún no has realizado ninguna compra.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

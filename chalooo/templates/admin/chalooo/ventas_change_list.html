@@ -1,0 +1,84 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 0.5rem;">Gráfica mensual de ventas</h2>
+
+    <!-- FILTRO DE FECHAS -->
+    <form method="get" style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 10px; align-items: end;">
+        <div>
+            <label>Desde:</label>
+            <input type="date" name="fecha_desde" value="{{ request.GET.fecha_desde|default:'' }}" class="vDateField">
+        </div>
+        <div>
+            <label>Hasta:</label>
+            <input type="date" name="fecha_hasta" value="{{ request.GET.fecha_hasta|default:'' }}" class="vDateField">
+        </div>
+        <button type="submit" class="button">Filtrar</button>
+        <a href="." class="button" style="background: #ccc;">Limpiar</a>
+
+        <a href="?export=csv{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}{% if request.GET.fecha_hasta %}&fecha_hasta={{ request.GET.fecha_hasta }}{% endif %}" class="button" style="background: #4CAF50; color: white; margin-left: 15px;">
+            Exportar CSV
+        </a>
+    </form>
+
+    <canvas id="ventasChart" width="900" height="350"
+        style="background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 10px;">
+    </canvas>
+</div>
+
+{{ block.super }}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+<script>
+(function() {
+    const rawData = JSON.parse('{{ chart_data|escapejs }}');
+    if (!rawData || rawData.length === 0) return;
+
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    const labels = rawData.map(d => `${monthNames[d.month - 1]} ${d.year}`);
+    const totals = rawData.map(d => parseFloat(d.total));
+
+    const ctx = document.getElementById('ventasChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total de Ventas por Mes',
+                data: totals,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Ventas mensuales totales (MXN)' },
+                tooltip: { callbacks: { label: c => '$' + c.formattedValue } }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Monto total ($)' }
+                },
+                x: { title: { display: true, text: 'Mes' } }
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

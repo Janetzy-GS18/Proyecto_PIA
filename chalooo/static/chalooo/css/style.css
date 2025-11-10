@@ -1,4 +1,9 @@
-/* === Chalooo v3 – CSS optimizado y estable === */
+/* === Chalooo v3.1 – CSS optimizado y estable === */
+
+/* === CONFIGURACIÓN GLOBAL === */
+html {
+    overflow-y: scroll; /* Mantiene la barra vertical fija */
+}
 
 body {
     background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
@@ -17,23 +22,56 @@ h1, h2, h3, h4 {
 
 /* === TARJETAS DE PRODUCTO === */
 .product-card {
-    border: 1px solid #ddd;
+    border: 1px solid #dee2e6;
     border-radius: 12px;
-    padding: 15px;
-    background: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     text-align: center;
+    padding: 18px 20px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    height: 100%;
+    min-height: 360px;
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .product-card img {
     max-width: 100%;
+    max-height: 170px;
+    object-fit: contain;
     border-radius: 8px;
     margin-bottom: 10px;
+}
+
+.product-card h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.product-card p {
+    margin-bottom: 5px;
+}
+
+.product-card .fw-bold {
+    font-size: 1.1rem;
+}
+
+.product-card .stock-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.product-card .btn {
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 10px;
 }
 
 /* === BOTONES === */
@@ -42,7 +80,7 @@ h1, h2, h3, h4 {
     border: none;
     border-radius: 8px;
     padding: 10px 16px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease;
 }
 
 .btn-primary:hover {
@@ -88,6 +126,7 @@ a {
     color: #0d6efd;
     text-decoration: none;
 }
+
 a:hover {
     color: #0b5ed7;
     text-decoration: underline;
@@ -112,4 +151,13 @@ a:hover {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+.product-card.low-stock {
+    border-color: #ffc107;
+}
+
+.product-card.out-of-stock {
+    border-color: #dc3545;
+    opacity: 0.7;
 }

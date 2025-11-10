@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 # ---------- MANAGER PERSONALIZADO PARA USUARIO ----------
+
 class UsuarioManager(BaseUserManager):
     """Gestor personalizado para crear usuarios y superusuarios."""
 
@@ -27,6 +28,7 @@ class UsuarioManager(BaseUserManager):
         return self.create_user(correo, nombre_s, apellido_s, password, **extra_fields)
 
 # ---------- Usuario ----------
+
 class Usuario(AbstractBaseUser, PermissionsMixin):
     """Modelo base de usuario del sistema."""
     idusuario = models.AutoField(primary_key=True)
@@ -46,6 +48,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         return f"{self.nombre_s} {self.apellido_s} ({self.correo})"
 
 # ---------- Subtipo: Cliente ----------
+
 class Cliente(models.Model):
     """Subtipo de Usuario que representa a un cliente."""
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
@@ -71,17 +74,23 @@ class TelefonoCliente(models.Model):
 
 
 # ---------- Subtipo: Empleado ----------
+
 class Empleado(models.Model):
     """Subtipo de Usuario que representa a un empleado."""
+    ROLES = [
+        ('admin', 'Administrador'),
+        ('analista', 'Analista Financiero'),
+    ]
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
-    rol = models.CharField(max_length=20)
+    rol = models.CharField(max_length=20, choices=ROLES, default='analista')
 
     def __str__(self):
         """Devuelve el nombre del empleado y su rol."""
-        return f"Empleado: {self.usuario.nombre_s} ({self.rol})" # pylint: disable=no-member
+        return f"{self.usuario.nombre_s} ({self.get_rol_display()})" # pylint: disable=no-member
 
 
 # ---------- Producto ----------
+
 class Producto(models.Model):
     """Modelo que representa un producto disponible para la venta."""
     id_producto = models.AutoField(primary_key=True)
@@ -97,18 +106,36 @@ class Producto(models.Model):
 
 
 # ---------- Venta ----------
+
 class Venta(models.Model):
     """Modelo que representa una venta realizada por un cliente."""
+    ESTADOS = [
+        ('completada', 'Completada'),
+        ('anulada', 'Anulada'),
+    ]
+
     id_venta = models.AutoField(primary_key=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    estado = models.CharField(max_length=15, choices=ESTADOS, default='completada')
 
     def actualizar_total(self):
         """Recalcula el total sumando los subtotales de sus detalles."""
-        total = sum(det.subtotal for det in self.detalleventa_set.all()) # pylint: disable=no-member
+        total = sum(det.subtotal for det in self.detalleventa_set.all())  # pylint: disable=no-member
         self.total = total
         self.save(update_fields=["total"])
+
+    def anular(self):
+        """Anula la venta y restaura el stock de los productos."""
+        if self.estado == 'anulada':
+            return  # evitar doble anulación
+
+        for detalle in self.detalleventa_set.all():  # pylint: disable=no-member
+            detalle.producto.stock += detalle.cantidad  # pylint: disable=no-member
+            detalle.producto.save()
+        self.estado = 'anulada'
+        self.save(update_fields=['estado'])
 
     def __str__(self):
         """Muestra el ID de venta y el cliente."""

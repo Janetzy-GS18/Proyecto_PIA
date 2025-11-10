@@ -18,7 +18,7 @@
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="{% url 'chalooo:index' %}">🛒 Chalooo</a>
+            <a class="navbar-brand fw-bold" href="{% url 'chalooo:index' %}">Chalooo</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -28,16 +28,21 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" 
-                           href="{% url 'chalooo:index' %}">Inicio</a>
+                            href="{% url 'chalooo:index' %}">Inicio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'productos' %}active{% endif %}" 
-                           href="{% url 'chalooo:productos' %}">Productos</a>
+                            href="{% url 'chalooo:productos' %}">Productos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'carrito' %}active{% endif %}" 
-                           href="{% url 'chalooo:carrito' %}">Carrito</a>
+                            href="{% url 'chalooo:carrito' %}">Carrito</a>
                     </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'chalooo:historial' %}">Mis Compras</a>
+                        </li>
+                    {% endif %}
                 </ul>
 
                 <!-- Enlaces dinámicos -->
@@ -50,8 +55,8 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-warning" 
-                               href="{% url 'chalooo:logout' %}" 
-                               onclick="return confirmarCierreSesion();">
+                                href="{% url 'chalooo:logout' %}" 
+                                onclick="return confirmarCierreSesion();">
                                 <i class="bi bi-box-arrow-right"></i> Cerrar sesión
                             </a>
                         </li>

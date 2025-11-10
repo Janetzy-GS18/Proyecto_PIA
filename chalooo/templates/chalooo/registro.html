@@ -5,16 +5,21 @@
 
 {% block content %}
 <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow p-4" style="max-width: 500px; width: 100%;">
+    <div class="card shadow p-4" style="max-width: 550px; width: 100%;">
         <h2 class="text-center mb-4 text-success">Crear cuenta</h2>
 
-        <form method="POST">
+        <form method="POST" autocomplete="off">
             {% csrf_token %}
             {% if form.errors %}
                 <div class="alert alert-danger">
-                    Revisa los datos ingresados. Algunas contraseñas pueden no coincidir.
+                    <strong>Errores:</strong>
+                    <ul>
+                        {% for field, errores in form.errors.items %}
+                            <li><b>{{ field }}</b>: {{ errores }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
-            {% endif %}
+{% endif %}
 
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -22,7 +27,7 @@
                     {{ form.nombre_s }}
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Apellidos</label>
+                    <label class="form-label">Apellido(s)</label>
                     {{ form.apellido_s }}
                 </div>
             </div>
@@ -30,6 +35,19 @@
             <div class="mb-3">
                 <label class="form-label">Correo electrónico</label>
                 {{ form.correo }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Dirección</label>
+                {{ form.direccion }}
+            </div>
+
+            <div id="telefono-container" class="mb-3">
+                <label class="form-label">Teléfonos</label>
+                <div class="input-group mb-2 telefono-input">
+                    <input type="text" name="telefonos" class="form-control" placeholder="Ej: 5551234567">
+                    <button type="button" class="btn btn-outline-success add-telefono">+</button>
+                </div>
             </div>
 
             <div class="row">
@@ -54,4 +72,26 @@
         </p>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const container = document.getElementById("telefono-container");
+
+        container.addEventListener("click", function(e) {
+            if (e.target.classList.contains("add-telefono")) {
+                const nuevo = document.createElement("div");
+                nuevo.classList.add("input-group", "mb-2", "telefono-input");
+                nuevo.innerHTML = `
+                    <input type="text" name="telefonos" class="form-control" placeholder="Ej: 5587654321">
+                    <button type="button" class="btn btn-outline-danger remove-telefono">-</button>
+                `;
+                container.appendChild(nuevo);
+            }
+
+            if (e.target.classList.contains("remove-telefono")) {
+                e.target.parentElement.remove();
+            }
+        });
+    });
+</script>
 {% endblock %}
