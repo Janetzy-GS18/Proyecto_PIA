@@ -9,6 +9,8 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.conf import settings
 
+# pylint: disable=no-member
+
 # Librerías para PDF y código de barras
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -103,7 +105,7 @@ def eliminar_del_carrito(request, producto_id):
 
 @login_required
 def checkout(request):
-    """Confirma la compra y genera una venta."""
+    """Confirma la compra y genera una venta con desglose de IVA (solo visual)."""
     carrito_items = request.session.get('carrito', {})
     if not carrito_items:
         messages.warning(request, "Tu carrito está vacío.")
@@ -111,41 +113,49 @@ def checkout(request):
 
     # Verifica que el usuario esté registrado como cliente
     try:
-        cliente = Cliente.objects.get(usuario=request.user)  # pylint: disable=no-member
-    except Cliente.DoesNotExist:  # pylint: disable=no-member
-        return render(request, "chalooo/checkout.html",
-                        {"error": "Debes registrarte como cliente."})
+        cliente = Cliente.objects.get(usuario=request.user)
+    except Cliente.DoesNotExist:
+        return render(
+            request, "chalooo/checkout.html", {"error": "Debes registrarte como cliente."}
+            )
 
     # Preparar los productos del carrito
     items = []
-    total = Decimal('0.00')
+    subtotal = Decimal('0.00')
     for producto_id, cantidad in carrito_items.items():
         producto = get_object_or_404(Producto, id_producto=producto_id)
-        subtotal = producto.precio * cantidad
-        items.append({'producto': producto, 'cantidad': cantidad, 'subtotal': subtotal})
-        total += subtotal
+        subtotal_item = producto.precio * cantidad
+        items.append({'producto': producto, 'cantidad': cantidad, 'subtotal': subtotal_item})
+        subtotal += subtotal_item
+
+    # Calcular IVA (16%) y total con IVA
+    iva = subtotal * Decimal('0.16')
+    total_con_iva = subtotal + iva
 
     # Si se confirma la compra (método POST)
     if request.method == "POST":
-        venta = Venta.objects.create(cliente=cliente, total=0)  # pylint: disable=no-member
+        venta = Venta.objects.create(cliente=cliente, total=subtotal)
         for item in items:
-            DetalleVenta.objects.create(  # pylint: disable=no-member
+            DetalleVenta.objects.create(
                 venta=venta,
                 producto=item['producto'],
                 cantidad=item['cantidad'],
                 subtotal=item['subtotal']
             )
 
-        # Actualiza total
-        venta.total = total
+        venta.total = subtotal
         venta.save()
 
-        # Vaciar carrito
         request.session['carrito'] = {}
         messages.success(request, "¡Compra confirmada con éxito!")
         return redirect('chalooo:confirmacion', venta_id=venta.id_venta)
 
-    return render(request, "chalooo/checkout.html", {'items': items, 'total': total})
+    return render(request, "chalooo/checkout.html", {
+        'items': items,
+        'subtotal': subtotal,
+        'iva': iva,
+        'total_con_iva': total_con_iva
+    })
 
 
 # ------------------------- CONFIRMACIÓN -------------------------
@@ -159,29 +169,39 @@ def confirmacion(request, venta_id):
 
 # ------------------------- HISTORIAL -------------------------
 
-
 @login_required
 def historial_compras(request):
-    """Muestra las ventas realizadas por el usuario."""
-    cliente = get_object_or_404(Cliente, usuario=request.user)
-    ventas = Venta.objects.filter(cliente=cliente).order_by('-fecha')  # pylint: disable=no-member
-    return render(request, "chalooo/historial.html", {"ventas": ventas})
+    """Muestra las compras realizadas por el cliente autenticado."""
+    try:
+        cliente = Cliente.objects.get(usuario=request.user)
+    except Cliente.DoesNotExist:
+        messages.warning(request, "Debes registrarte como cliente para ver tu historial.")
+        return redirect("chalooo:registro")
 
+    ventas = Venta.objects.filter(cliente=cliente).order_by("-fecha")
+    return render(request, "chalooo/historial.html", {"ventas": ventas})
 
 @login_required
 def anular_venta(request, venta_id):
-    """Permite al usuario anular su venta (si aún está completada)."""
-    venta = get_object_or_404(Venta, id_venta=venta_id, cliente__usuario=request.user)
-    if venta.estado == 'completada':
-        venta.anular()
-        messages.info(request, "La compra ha sido anulada y el stock fue restaurado.")
-    else:
-        messages.warning(request, "Esta venta ya está anulada.")
-    return redirect('chalooo:historial')
+    """Permite al cliente anular una compra si está completada."""
+    venta = get_object_or_404(Venta, id_venta=venta_id)
 
+    # Verifica que la venta pertenezca al usuario actual
+    if venta.cliente.usuario != request.user:
+        messages.error(request, "No tienes permiso para anular esta venta.")
+        return redirect("chalooo:historial")
+
+    # Solo se puede anular si está completada
+    if venta.estado == "anulada":
+        messages.info(request, "Esta venta ya está anulada.")
+    else:
+        venta.estado = "anulada"
+        venta.save()
+        messages.success(request, f"La venta #{venta.id_venta} ha sido anulada correctamente.")
+
+    return redirect("chalooo:historial")
 
 # ------------------------- RECIBO PDF -------------------------
-
 
 @login_required
 def recibo_pdf(request, venta_id):  # pylint: disable=unused-argument
@@ -195,6 +215,7 @@ def recibo_pdf(request, venta_id):  # pylint: disable=unused-argument
 
     pdf = canvas.Canvas(response, pagesize=A4)
     _, height = A4
+    y = height - 130  # Definir antes de usarse
 
     # ---------------- Encabezado ----------------
     logo_path = os.path.join(
@@ -207,21 +228,16 @@ def recibo_pdf(request, venta_id):  # pylint: disable=unused-argument
                 logo_path, 40, height - 100, width=90, height=60, preserveAspectRatio=True)
         except Exception:  # pylint: disable=broad-exception-caught
             pass
-
     else:
-        print(f"⚠️ No se encontró el logo en: {logo_path}")
+        print(f"No se encontró el logo en: {logo_path}")
 
     pdf.setFont("Helvetica-Bold", 20)
     pdf.drawString(150, height - 70, "Recibo de Compra")
-
-    pdf.setFont("Helvetica", 11)
-    pdf.drawString(150, height - 90, "Gracias por tu compra. ¡Esperamos verte pronto!")
 
     pdf.setFont("Helvetica-Bold", 11)
     pdf.drawString(150, height - 105, f"Estado: {venta.estado.capitalize()}")
 
     # ---------------- Datos del Cliente ----------------
-    y = height - 130
     pdf.setFont("Helvetica-Bold", 12)
     pdf.drawString(40, y, "Datos del Cliente:")
 
@@ -234,12 +250,10 @@ def recibo_pdf(request, venta_id):  # pylint: disable=unused-argument
     pdf.drawString(60, y - 45, f"Dirección: {cliente.direccion or 'No registrada'}")
 
     # Obtener todos los teléfonos asociados
-    telefonos = TelefonoCliente.objects.filter(cliente=cliente) # pylint: disable=no-member
-    if telefonos.exists():
-        tel_texto = ", ".join([t.telefono for t in telefonos])
-    else:
-        tel_texto = "No registrados"
-
+    telefonos = TelefonoCliente.objects.filter(cliente=cliente)
+    tel_texto = ", ".join(
+        [t.telefono for t in telefonos]
+        ) if telefonos.exists() else "No registrados"
     pdf.drawString(60, y - 60, f"Teléfonos: {tel_texto}")
 
     # ---------------- Código de barras ----------------
@@ -267,9 +281,16 @@ def recibo_pdf(request, venta_id):  # pylint: disable=unused-argument
             y = height - 80
             pdf.setFont("Helvetica", 10)
 
-    # ---------------- Total ----------------
+    # ---------------- Totales con IVA ----------------
     pdf.setFont("Helvetica-Bold", 12)
-    pdf.drawString(40, y - 10, f"Total de la compra: ${venta.total:.2f}")
+    y -= 20
+    subtotal = venta.total
+    iva = subtotal * Decimal('0.16')
+    total_con_iva = subtotal + iva
+
+    pdf.drawString(40, y, f"Subtotal: ${subtotal:.2f}")
+    pdf.drawString(40, y - 15, f"IVA (16%): ${iva:.2f}")
+    pdf.drawString(40, y - 30, f"Total con IVA: ${total_con_iva:.2f}")
 
     # ---------------- Pie ----------------
     pdf.setFont("Helvetica-Oblique", 9)

@@ -40,8 +40,10 @@
                     </table>
                 </div>
 
-                <div class="text-end mt-3">
-                    <h5>Total a pagar: <strong>${{ total }}</strong></h5>
+                <div class="text-end mt-4">
+                    <h6>Subtotal: <strong>${{ subtotal|floatformat:2 }}</strong></h6>
+                    <h6>IVA (16%): <strong>${{ iva|floatformat:2 }}</strong></h6>
+                    <h5 class="mt-2 text-success">Total a pagar (con IVA): <strong>${{ total_con_iva|floatformat:2 }}</strong></h5>
                 </div>
 
                 <form method="post" class="text-center mt-4">
